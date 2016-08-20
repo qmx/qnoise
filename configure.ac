@@ -1,4 +1,4 @@
-AC_INIT([qnoise], [0.1], [qmx@qmx.me])
+AC_INIT([qnoise], [0.0.2], [qmx@qmx.me])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_PROG_CC
