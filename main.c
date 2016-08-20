@@ -120,5 +120,5 @@ float myrand(void) {
 }
 
 float noise(float last) {
-    return (last + (0.02 * myrand())) / 1.02;
+    return 0.9 * (last + (0.02 * myrand())) / 1.02;
 }
