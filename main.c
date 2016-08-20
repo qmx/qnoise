@@ -6,6 +6,8 @@ void ctx_state_cb(pa_context *ctx, void *loop);
 void stream_state_cb(pa_stream *stream, void *loop);
 void stream_write_cb(pa_stream *stream, size_t requested_bytes, void *userdata);
 void stream_success_cb(pa_stream *stream, int success, void *userdata);
+float myrand(void);
+float noise(float last);
 
 int main(int argc, char *argv[]) {
     pa_threaded_mainloop *loop;
@@ -35,7 +37,7 @@ int main(int argc, char *argv[]) {
     }
 
     pa_sample_spec sample_specifications;
-    sample_specifications.format = PA_SAMPLE_S16LE;
+    sample_specifications.format = PA_SAMPLE_FLOAT32LE;
     sample_specifications.rate = 44100;
     sample_specifications.channels = 2;
 
@@ -85,8 +87,8 @@ void stream_state_cb(pa_stream *stream, void *loop) {
 void stream_write_cb(pa_stream *stream, size_t requested_bytes, void *userdata) {
     size_t bytes_remaining = requested_bytes;
     while (bytes_remaining > 0) {
-        int16_t *buffer = NULL;
-        size_t bytes_to_fill = 44100 * 2;
+        float *buffer = NULL;
+        size_t bytes_to_fill = 44100 * 4;
         size_t i;
 
         if(bytes_to_fill > bytes_remaining) {
@@ -95,12 +97,11 @@ void stream_write_cb(pa_stream *stream, size_t requested_bytes, void *userdata) 
 
         pa_stream_begin_write(stream, (void**) &buffer, &bytes_to_fill);
 
-        int16_t lastL = 1, lastR = 1;
+        float lastL = 0, lastR = 0;
         for (i = 0; i < bytes_to_fill; i += 2) {
-
-            buffer[i] = (int16_t)(lastL + (0.02 * rand()) / 1.02);
+            buffer[i] = noise(lastL);
             lastL = buffer[i];
-            buffer[i+1] = (int16_t)(lastR + (0.02 * rand()) / 1.02);
+            buffer[i+1] = noise(lastR);
             lastR = buffer[i+1];
         }
 
@@ -114,3 +115,10 @@ void stream_success_cb(pa_stream *stream, int success, void *userdata) {
     return ;
 }
 
+float myrand(void) {
+    return -1.0 + (2.0* ((float)rand())/RAND_MAX);
+}
+
+float noise(float last) {
+    return (last + (0.02 * myrand())) / 1.02;
+}
