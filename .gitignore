@@ -15,4 +15,5 @@ depcomp
 install-sh
 missing
 qnoise
-qnoise-main.o
+*.o
+*.gz
